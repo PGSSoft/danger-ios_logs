@@ -1,33 +1,83 @@
+require "git_diff_parser"
+
 module Danger
-  # This is your plugin class. Any attributes or methods you expose here will
-  # be available from within your Dangerfile.
+  # This is a danger plugin to detect any `NSLog`/`print` entries left in the code.
   #
-  # To be published on the Danger plugins site, you will need to have
-  # the public interface documented. Danger uses [YARD](http://yardoc.org/)
-  # for generating documentation from your plugin source, and you can verify
-  # by running `danger plugins lint` or `bundle exec rake spec`.
+  # @example Ensure, by warning, there are no `NSLog`/`print` left in the modified code
   #
-  # You should replace these comments with a public description of your library.
-  #
-  # @example Ensure people are well warned about merging on Mondays
-  #
-  #          my_plugin.warn_on_mondays
+  #          ios_logs.check
+  # 
+  # @example Ensure, by fail, there are no `NSLog`/`print` left in the modified code
+  # 
+  #          ios_logs.check :fail
+  # 
+  # @example Ensure, there are no `print` left in the modified code. Ignore `NSLog`
+  # 
+  #          ios_logs.nslog = false
+  #          ios_logs.check
   #
   # @see  Bartosz Janda/danger-ios_logs
-  # @tags monday, weekends, time, rattata
+  # @tags ios, logs, print, nslog, swift
   #
   class DangerIosLogs < Plugin
 
-    # An attribute that you can read/write from your Dangerfile
-    #
-    # @return   [Array<String>]
-    attr_accessor :my_attribute
+    NSLOG_REGEXP = /\s+NSLog\s*\(/
+    PRINT_REGEXP = /\s+print\s*\(/
 
-    # A method that you can call from your Dangerfile
-    # @return   [Array<String>]
-    #
-    def warn_on_mondays
-      warn 'Trying to merge code on a Monday' if Date.today.wday == 1
+    # Notify usage of `NSLog`. `true` by default
+    # 
+    # @return [Bool]
+    attr_writer :nslog
+
+    # Notify usage of `print`. `true` by default
+    # 
+    # @return [Bool]
+    attr_writer :print
+
+    # 
+    # Initialize plugin
+    # @param keywords [type] [description]
+    # 
+    # @return [type] [description]
+    def initialize(keywords)
+      super(keywords)
+      @print = true
+      @nslog = true
+    end
+
+    # 
+    # Checks if in the changed code are used any `NSLog`s or `print`s
+    # @param method = :warn [Symbol] Used method to indicate log method usage. By default `:warn`. Possible values: `:message`, `:warn`, `:fail`
+    # 
+    # @return [Void]
+    def check(method = :warn)
+      files = files_of_interest
+      files.each do |file|
+        GitDiffParser::Patch.new(git.diff_for_file(file).patch).changed_lines.each do |line|
+          check_line(file, line, method)
+        end
+      end
+    end
+
+    private
+    # 
+    # List of interested files.
+    # 
+    # @return [Array<String>] List of interested / modified files to check.
+    def files_of_interest
+      git.modified_files + git.added_files
+    end
+
+    # 
+    # Check line if contains any `NSLog` or `print`
+    # @param file [String] Path to file
+    # @param line [String] Line number
+    # @param method [Symbol] Method to indicate usage
+    # 
+    # @return [type] [description]
+    def check_line(file, line, method)
+      public_send(method, "There remain `NSLog` in the modified code.", sticky: false, file: file, line: line.number) if @nslog && line.content.match?(NSLOG_REGEXP)
+      public_send(method, "There remain `print` in the modified code.", sticky: false, file: file, line: line.number) if @print && line.content.match?(PRINT_REGEXP)
     end
   end
 end
