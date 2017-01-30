@@ -24,6 +24,9 @@ module Danger
     NSLOG_REGEXP = /\s+NSLog\s*\(/
     PRINT_REGEXP = /\s+print\s*\(/
 
+    NSLOG_MESSAGE = "There remain `NSLog` in the modified code."
+    PRINT_MESSAGE = "There remain `print` in the modified code."
+
     # Notify usage of `NSLog`. `true` by default
     # 
     # @return [Bool]
@@ -52,10 +55,11 @@ module Danger
     # @return [Void]
     def check(method = :warn)
       files = files_of_interest
-      files.each do |file|
-        GitDiffParser::Patch.new(git.diff_for_file(file).patch).changed_lines.each do |line|
-          check_line(file, line, method)
-        end
+      files.select { |f| f.is_a?(String) }
+        .each do |file|
+          GitDiffParser::Patch.new(git.diff_for_file(file).patch).changed_lines.each do |line|
+            check_line(file, line, method)
+          end
       end
     end
 
@@ -76,8 +80,8 @@ module Danger
     # 
     # @return [type] [description]
     def check_line(file, line, method)
-      public_send(method, "There remain `NSLog` in the modified code.", sticky: false, file: file, line: line.number) if @nslog && line.content.match?(NSLOG_REGEXP)
-      public_send(method, "There remain `print` in the modified code.", sticky: false, file: file, line: line.number) if @print && line.content.match?(PRINT_REGEXP)
+      public_send(method, NSLOG_MESSAGE, sticky: false, file: file, line: line.number) if @nslog && line.content.match?(NSLOG_REGEXP)
+      public_send(method, PRINT_MESSAGE, sticky: false, file: file, line: line.number) if @print && line.content.match?(PRINT_REGEXP)
     end
   end
 end

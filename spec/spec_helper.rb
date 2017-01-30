@@ -57,3 +57,19 @@ def testing_dangerfile
   env = Danger::EnvironmentManager.new(testing_env)
   Danger::Dangerfile.new(env, testing_ui)
 end
+
+def messages
+  @dangerfile.status_report[:messages]
+end
+
+def failures
+  @dangerfile.status_report[:errors]
+end
+
+def warnings
+  @dangerfile.status_report[:warnings]
+end
+
+def markdowns
+  @dangerfile.status_report[:markdowns].map(&:message)
+end
