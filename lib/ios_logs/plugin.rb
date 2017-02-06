@@ -1,8 +1,6 @@
 require 'git_diff_parser'
 
 module Danger
-  # rubocop:disable Metrics/LineLength
-
   # This is a danger plugin to detect any `NSLog`/`print` entries left in the code.
   #
   # @example Ensure, by warning, there are no `NSLog`/`print` entries left in the modified code
@@ -22,7 +20,6 @@ module Danger
   # @tags ios, logs, print, nslog, swift
   #
   class DangerIosLogs < Plugin
-    # rubocop:enable Metrics/LineLength
     NSLOG_REGEXP = /\s+NSLog\s*\(/
     PRINT_REGEXP = /\s+print\s*\(/
 
@@ -33,13 +30,13 @@ module Danger
     # Notify usage of `NSLog`. `true` by default
     #
     # @return [Bool]
-    attr_writer :nslog
+    attr_accessor :nslog
 
     #
     # Notify usage of `print`. `true` by default
     #
     # @return [Bool]
-    attr_writer :print
+    attr_accessor :print
 
     #
     # List of `print` in changeset
@@ -61,10 +58,10 @@ module Danger
 
     #
     # Initialize plugin
-    # @param keywords [type] [description]
+    # @param dangerfile [Dangerfile] Dangerfile used to initialize plugin
     #
-    # @return [type] [description]
-    def initialize(keywords)
+    # @return [DangerIosLogs] Initialized DangerIosLogs plugin
+    def initialize(dangerfile)
       super
       @print = true
       @nslog = true
@@ -87,6 +84,7 @@ module Danger
     #
     # @return [Void]
     def check(method = :warn)
+      raise 'Unsupported method' unless [:message, :warn, :fail].include?(method)
       @nslogs = []
       @prints = []
 
@@ -103,8 +101,7 @@ module Danger
     #
     # @return [Void]
     def check_files(files)
-      files.select { |file| file.is_a? String }
-           .each { |file| check_file file }
+      files.each { |file| check_file(file) if file.is_a? String }
     end
 
     #
@@ -143,10 +140,8 @@ module Danger
     #
     # @return [Void]
     def check_line(file, line)
-      prints << Danger::FileLog.new(file, line.number) \
-        if @print && line.content.match?(PRINT_REGEXP)
-      nslogs << Danger::FileLog.new(file, line.number) \
-        if @nslog && line.content.match?(NSLOG_REGEXP)
+      prints << Danger::FileLog.new(file, line.number) if @print && line.content.match?(PRINT_REGEXP)
+      nslogs << Danger::FileLog.new(file, line.number) if @nslog && line.content.match?(NSLOG_REGEXP)
     end
 
     #

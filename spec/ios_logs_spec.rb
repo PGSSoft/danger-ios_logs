@@ -1,23 +1,23 @@
 require File.expand_path('../spec_helper', __FILE__)
+require 'shared_example_groups/files_in_changeset'
+require 'shared_example_groups/files_not_in_changeset'
+require 'shared_example_groups/logs_in_dockerfile'
 
-# rubocop:disable Metrics/ModuleLength, Metrics/BlockLength
+# rubocop:disable Metrics/BlockLength
 
 module Danger
   describe Danger::DangerIosLogs do
     it 'should be a plugin' do
-      expect(Danger::DangerIosLogs.new(nil)).to be_a Danger::Plugin
+      expect(described_class).to be < Danger::Plugin
     end
 
-    #
-    # You should test your custom attributes and methods here
-    #
-    describe 'with Dangerfile' do
+    context 'with Dangerfile' do
       before do
         @dangerfile = testing_dangerfile
         @ios_logs = @dangerfile.ios_logs
       end
 
-      context 'changed files containing newly introduced todos' do
+      context 'changed files containing newly introduced logs' do
         before do
           patch = <<PATCH
 + NSLog("Some log")
@@ -37,62 +37,52 @@ PATCH
             patch: '+ print(\"More logs\")'
           )
 
-          allow(@dangerfile.git).to receive(:diff_for_file)
-            .with('some/file.rb').and_return(modified)
-
-          allow(@dangerfile.git).to receive(:diff_for_file)
-            .with('another/stuff.rb').and_return(added)
-
-          allow(@dangerfile.git).to receive(:modified_files)
-            .and_return(['some/file.rb'])
-          allow(@dangerfile.git).to receive(:added_files)
-            .and_return(['another/stuff.rb'])
+          allow(@dangerfile.git).to receive(:diff_for_file).with('some/file.rb').and_return(modified)
+          allow(@dangerfile.git).to receive(:diff_for_file).with('another/stuff.rb').and_return(added)
+          allow(@dangerfile.git).to receive(:modified_files).and_return(['some/file.rb'])
+          allow(@dangerfile.git).to receive(:added_files).and_return(['another/stuff.rb'])
         end
 
-        it 'warns when files in the changeset' do
-          @ios_logs.check
+        some_file_0th_line = Danger::FileLog.new('some/file.rb', 0)
+        some_file_3rd_line = Danger::FileLog.new('some/file.rb', 3)
+        another_stuff = Danger::FileLog.new('another/stuff.rb', 0)
 
-          expect(warnings.length).to eq(3)
-          expect(warnings[0]).to \
-            eq('There remain `print` in the modified code.')
-          expect(warnings[1]).to \
-            eq('There remain `print` in the modified code.')
-          expect(warnings[2]).to \
-            eq('There remain `NSLog` in the modified code.')
+        context 'warns when files in the changeset' do
+          before do
+            @ios_logs.check
+          end
+
+          it_behaves_like 'files in changeset' do
+            let(:log_method) { warnings }
+          end
         end
 
-        it 'fails when files in the changeset' do
-          @ios_logs.check :fail
+        context 'fails when files in the changeset' do
+          before do
+            @ios_logs.check :fail
+          end
 
-          expect(failures.length).to eq(3)
-          expect(failures[0]).to \
-            eq('There remain `print` in the modified code.')
-          expect(failures[1]).to \
-            eq('There remain `print` in the modified code.')
-          expect(failures[2]).to \
-            eq('There remain `NSLog` in the modified code.')
+          it_behaves_like 'files in changeset' do
+            let(:log_method) { failures }
+          end
         end
 
-        it 'exposes logs to the dangerfile' do
-          @ios_logs.check
+        context 'expose logs to the dangerfile' do
+          before do
+            @ios_logs.check
+          end
 
-          expect(@ios_logs.prints.length).to eq(2)
-          expect(@ios_logs.prints[0]).to \
-            eq(Danger::FileLog.new('some/file.rb', 3))
-          expect(@ios_logs.prints[1]).to \
-            eq(Danger::FileLog.new('another/stuff.rb', 0))
+          it_behaves_like 'logs in dockerfile', [some_file_3rd_line, another_stuff] do
+            let(:logs) { @ios_logs.prints }
+          end
 
-          expect(@ios_logs.nslogs.length).to eq(1)
-          expect(@ios_logs.nslogs[0]).to \
-            eq(Danger::FileLog.new('some/file.rb', 0))
+          it_behaves_like 'logs in dockerfile', [some_file_0th_line] do
+            let(:logs) { @ios_logs.nslogs }
+          end
 
-          expect(@ios_logs.logs.length).to eq(3)
-          expect(@ios_logs.logs[0]).to \
-            eq(Danger::FileLog.new('some/file.rb', 3))
-          expect(@ios_logs.logs[1]).to \
-            eq(Danger::FileLog.new('another/stuff.rb', 0))
-          expect(@ios_logs.logs[2]).to \
-            eq(Danger::FileLog.new('some/file.rb', 0))
+          it_behaves_like 'logs in dockerfile', [some_file_3rd_line, another_stuff, some_file_0th_line] do
+            let(:logs) { @ios_logs.logs }
+          end
         end
       end
 
@@ -101,36 +91,27 @@ PATCH
           modified = Git::Diff::DiffFile.new(
             'base',
             path:  'some/file.rb',
-            patch: '+ some added line'
+            patch: '+ an added line'
           )
-          allow(@dangerfile.git).to receive(:diff_for_file)
-            .with('some/file.rb').and_return(modified)
-
-          allow(@dangerfile.git).to receive(:modified_files)
-            .and_return(['some/file.rb'])
+          allow(@dangerfile.git).to receive(:diff_for_file).with('some/file.rb').and_return(modified)
+          allow(@dangerfile.git).to receive(:modified_files).and_return(['some/file.rb'])
           allow(@dangerfile.git).to receive(:added_files).and_return([])
-        end
 
-        it 'reports nothing' do
           @ios_logs.check
-
-          expect(messages).to be_empty
-          expect(warnings).to be_empty
-          expect(failures).to be_empty
-          expect(markdowns).to be_empty
         end
+
+        it_behaves_like 'files not in changeset'
       end
 
-      it 'does nothing when no files are in changeset' do
-        allow(@dangerfile.git).to receive(:modified_files).and_return([])
-        allow(@dangerfile.git).to receive(:added_files).and_return([])
+      context 'no files are in changeset' do
+        before do
+          allow(@dangerfile.git).to receive(:modified_files).and_return([])
+          allow(@dangerfile.git).to receive(:added_files).and_return([])
 
-        @ios_logs.check
+          @ios_logs.check
+        end
 
-        expect(messages).to be_empty
-        expect(warnings).to be_empty
-        expect(failures).to be_empty
-        expect(markdowns).to be_empty
+        it_behaves_like 'files not in changeset'
       end
 
       it 'does not raise when git returns nil' do
@@ -139,6 +120,10 @@ PATCH
         allow(@dangerfile.git).to receive(:added_files).and_return(invalid)
 
         expect { @ios_logs.check }.to_not raise_error
+      end
+
+      it 'raise if used wrong method' do
+        expect { @ios_logs.check(:wrong_method) }.to raise_error('Unsupported method')
       end
     end
   end

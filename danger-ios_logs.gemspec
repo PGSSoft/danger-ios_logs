@@ -6,14 +6,14 @@ require 'ios_logs/gem_version.rb'
 Gem::Specification.new do |spec|
   spec.name          = 'danger-ios_logs'
   spec.version       = IosLogs::VERSION
-  spec.authors       = ['Bartosz Janda']
-  spec.email         = ['bjanda@pgs-soft.com']
-  spec.description   = %q{A short description of danger-ios_logs.}
-  spec.summary       = %q{A longer description of danger-ios_logs.}
+  spec.authors       = ['Bartosz Janda', 'Joanna Bednarz']
+  spec.email         = ['bjanda@pgs-soft.com', 'jbednarz@pgs-soft.com']
+  spec.description   = 'A short description of danger-ios_logs.'
+  spec.summary       = 'A longer description of danger-ios_logs.'
   spec.homepage      = 'https://github.com/Bartosz Janda/danger-ios_logs'
   spec.license       = 'MIT'
 
-  spec.files         = `git ls-files`.split($/)
+  spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
@@ -29,8 +29,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.4'
 
   # Linting code and docs
-  spec.add_development_dependency "rubocop", "~> 0.41"
-  spec.add_development_dependency "yard", "~> 0.8"
+  spec.add_development_dependency 'rubocop', '~> 0.41'
+  spec.add_development_dependency 'yard', '~> 0.8'
 
   # Makes testing easy via `bundle exec guard`
   spec.add_development_dependency 'guard', '~> 2.14'
