@@ -140,8 +140,8 @@ module Danger
     #
     # @return [Void]
     def check_line(file, line)
-      prints << Danger::FileLog.new(file, line.number) if @print && line.content.match?(PRINT_REGEXP)
-      nslogs << Danger::FileLog.new(file, line.number) if @nslog && line.content.match?(NSLOG_REGEXP)
+      prints << Danger::FileLog.new(file, line.number) if @print && !line.content.match(PRINT_REGEXP).nil?
+      nslogs << Danger::FileLog.new(file, line.number) if @nslog && !line.content.match(NSLOG_REGEXP).nil?
     end
 
     #
