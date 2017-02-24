@@ -50,8 +50,8 @@ ios_logs.check</pre>
 The project is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
 ## About
-The project maintained by software development agency [PGS Software](https://www.pgs-soft.com/).
-See our other [open-source projects](https://github.com/PGSSoft) or [contact us](https://www.pgs-soft.com/contact-us/) to develop your product.
+The project maintained by software development agency [PGS Software](https://www.pgs-soft.com).
+See our other [open-source projects](https://github.com/PGSSoft) or [contact us](https://www.pgs-soft.com/contact-us) to develop your product.
 
 ## Follow us
 

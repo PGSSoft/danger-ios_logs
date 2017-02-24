@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = IosLogs::VERSION
   spec.authors       = ['Bartosz Janda', 'Joanna Bednarz']
   spec.email         = ['bjanda@pgs-soft.com', 'jbednarz@pgs-soft.com']
-  spec.description   = 'A short description of danger-ios_logs.'
-  spec.summary       = 'A longer description of danger-ios_logs.'
-  spec.homepage      = 'https://github.com/Bartosz Janda/danger-ios_logs'
+  spec.description   = 'Danger plugin to detect any NSLog/print entries left in the code'
+  spec.summary       = 'Danger plugin to detect any NSLog/print entries left in the code'
+  spec.homepage      = 'https://github.com/PGSSoft/danger-ios_logs'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
