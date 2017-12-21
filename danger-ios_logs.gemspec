@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Bartosz Janda', 'Joanna Bednarz']
   spec.email         = ['bjanda@pgs-soft.com', 'jbednarz@pgs-soft.com']
   spec.description   = 'Danger plugin to detect any NSLog/print entries left in the code'
-  spec.summary       = 'Danger plugin to detect any NSLog/print entries left in the code'
+  spec.summary       = 'Scan whole iOS project and detects usage of any NSLog/print entries in the code'
   spec.homepage      = 'https://github.com/PGSSoft/danger-ios_logs'
   spec.license       = 'MIT'
 
@@ -17,8 +17,10 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
+  spec.required_ruby_version = ">= 2.0.0"
+
   spec.add_runtime_dependency 'danger-plugin-api', '~> 1.0'
-  spec.add_runtime_dependency 'git_diff_parser', '~> 2.3.0'
+  spec.add_runtime_dependency 'git_diff_parser', '~> 2.3'
 
   # General ruby development
   spec.add_development_dependency 'bundler', '~> 1.3'
@@ -45,5 +47,5 @@ Gem::Specification.new do |spec|
   #    binding.pry
   #
   # This will stop test execution and let you inspect the results
-  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'pry', '~> 0.10'
 end
