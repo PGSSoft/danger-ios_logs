@@ -129,7 +129,7 @@ DEPENDENCIES
   pry
   rake (~> 10.0)
   rspec (~> 3.4)
-  rubocop (~> 0.41)
+  rubocop (~> 0.49)
   yard (~> 0.9.11)
 
 BUNDLED WITH

@@ -51,12 +51,6 @@ module Danger
     attr_accessor :nslogs
 
     #
-    # Combined list of both `NSLog` and `print`
-    #
-    # @return [Array<FileLog>] List of `NSLog` and `print`
-    attr_accessor :logs
-
-    #
     # Initialize plugin
     # @param dangerfile [Dangerfile] Dangerfile used to initialize plugin
     #
@@ -84,7 +78,7 @@ module Danger
     #
     # @return [Void]
     def check(method = :warn)
-      raise 'Unsupported method' unless [:message, :warn, :fail].include?(method)
+      raise 'Unsupported method' unless %i[message warn fail].include?(method)
       @nslogs = []
       @prints = []
 

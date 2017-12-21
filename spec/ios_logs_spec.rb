@@ -19,12 +19,14 @@ module Danger
 
       context 'changed files containing newly introduced logs' do
         before do
+          # rubocop:disable Layout/IndentHeredoc
           patch = <<PATCH
 + NSLog("Some log")
 + func foo() {
 + }
 + print("Some other log")
 PATCH
+          # rubocop:enable Layout/IndentHeredoc
 
           modified = Git::Diff::DiffFile.new(
             'base',
@@ -128,3 +130,5 @@ PATCH
     end
   end
 end
+
+# rubocop:enable Metrics/BlockLength
