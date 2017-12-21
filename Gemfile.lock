@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    danger-ios_logs (0.1.0)
+    danger-ios_logs (0.1.1)
       danger-plugin-api (~> 1.0)
       git_diff_parser (~> 2.3.0)
 
@@ -130,7 +130,7 @@ DEPENDENCIES
   rake (~> 10.0)
   rspec (~> 3.4)
   rubocop (~> 0.41)
-  yard (~> 0.8)
+  yard (~> 0.9.11)
 
 BUNDLED WITH
    1.16.0
