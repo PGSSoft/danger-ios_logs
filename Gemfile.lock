@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    danger-ios_logs (0.1.1)
+    danger-ios_logs (0.1.2)
       danger-plugin-api (~> 1.0)
       git_diff_parser (~> 2.3)
 
