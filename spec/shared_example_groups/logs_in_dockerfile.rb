@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples_for 'logs in dockerfile' do |log_files|
   it "should have #{log_files.count} logs" do
     expect(logs.length).to eq(log_files.count)

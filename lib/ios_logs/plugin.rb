@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'git_diff_parser'
 
 module Danger
@@ -20,11 +22,11 @@ module Danger
   # @tags ios, logs, print, nslog, swift
   #
   class DangerIosLogs < Plugin
-    NSLOG_REGEXP = /\s+NSLog\s*\(/
-    PRINT_REGEXP = /\s+print\s*\(/
+    NSLOG_REGEXP = /\s+NSLog\s*\(/.freeze
+    PRINT_REGEXP = /\s+print\s*\(/.freeze
 
-    NSLOG_MESSAGE = 'There remain `NSLog` in the modified code.'.freeze
-    PRINT_MESSAGE = 'There remain `print` in the modified code.'.freeze
+    NSLOG_MESSAGE = 'There remain `NSLog` in the modified code.'
+    PRINT_MESSAGE = 'There remain `print` in the modified code.'
 
     #
     # Notify usage of `NSLog`. `true` by default
@@ -79,6 +81,7 @@ module Danger
     # @return [Void]
     def check(method = :warn)
       raise 'Unsupported method' unless %i[message warn fail].include?(method)
+
       @nslogs = []
       @prints = []
 

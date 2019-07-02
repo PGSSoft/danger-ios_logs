@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples_for 'files in changeset' do
   it 'should have three logs' do
     expect(log_method.length).to eq(3)

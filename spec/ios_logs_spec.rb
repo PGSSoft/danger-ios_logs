@@ -1,4 +1,6 @@
-require File.expand_path('../spec_helper', __FILE__)
+# frozen_string_literal: true
+
+require File.expand_path('spec_helper', __dir__)
 require 'shared_example_groups/files_in_changeset'
 require 'shared_example_groups/files_not_in_changeset'
 require 'shared_example_groups/logs_in_dockerfile'
@@ -30,12 +32,12 @@ PATCH
 
           modified = Git::Diff::DiffFile.new(
             'base',
-            path:  'some/file.rb',
+            path: 'some/file.rb',
             patch: patch
           )
           added = Git::Diff::DiffFile.new(
             'base',
-            path:  'another/stuff.rb',
+            path: 'another/stuff.rb',
             patch: '+ print(\"More logs\")'
           )
 
@@ -92,7 +94,7 @@ PATCH
         before do
           modified = Git::Diff::DiffFile.new(
             'base',
-            path:  'some/file.rb',
+            path: 'some/file.rb',
             patch: '+ an added line'
           )
           allow(@dangerfile.git).to receive(:diff_for_file).with('some/file.rb').and_return(modified)
